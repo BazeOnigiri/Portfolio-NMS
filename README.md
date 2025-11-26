@@ -11,4 +11,4 @@ tool for academic or technical evaluation.
 
 Feel free to explore the different sections 
 to learn more about my journey and key projects [here](
-https://bazeonigiri.github.io/Portfolio/).
+https://bazeonigiri.github.io/Portfolio-NMS/).
