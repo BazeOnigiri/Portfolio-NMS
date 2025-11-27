@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'cailloux': {
             image: "assets/previewCailloux.png",
             techs: ["JavaScript", "Phaser.js", "HTML5", "Tiled"],
-            links: [{ text: "GitHub", url: "https://github.com/BazeOnigiri" }, { text: "Jouer / Play", url: "pages/cailloux.html" }],
+            links: [{ text: "GitHub", url: "https://github.com/BazeOnigiri/Cailloux-Evaluation" }, { text: "Jouer / Play", url: "pages/cailloux.html" }],
             fr: {
                 title: "Jeu 'Cailloux'", date: "Mars 2025", type: "Projet Universitaire",
                 description: `Un jeu de plateforme 2D avec Phaser 3. Gestion de la physique, création de niveaux avec Tiled et gestion des collisions.`
