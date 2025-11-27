@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- 1. DONNÉES (CONTENU + TRADUCTION) ---
-    
-    // Traductions générales de l'interface
     const uiTranslations = {
         'fr': {
             'nav-profil': 'Profil', 'nav-competences': 'Compétences', 'nav-education': 'Éducation',
@@ -60,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Données détaillées des projets (Français et Anglais)
     const projectsData = {
         'laravel': {
             image: "assets/imgWIP.png",
@@ -133,21 +129,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // --- 2. GESTION DE LA LANGUE (LOCALSTORAGE) ---
-    
-    // Récupérer la langue stockée ou mettre 'fr' par défaut
     let currentLang = localStorage.getItem('siteLanguage') || 'fr';
     
     function updatePageLanguage(lang) {
-        // Sauvegarder le choix
         localStorage.setItem('siteLanguage', lang);
         currentLang = lang;
 
-        // Mettre à jour le texte du bouton
         const btn = document.getElementById('lang-toggle-btn');
         if(btn) btn.textContent = (lang === 'fr') ? 'EN' : 'FR';
 
-        // 1. Traduire les éléments statiques (uiTranslations)
         document.querySelectorAll('[data-lang]').forEach(el => {
             const key = el.dataset.lang;
             if (uiTranslations[lang] && uiTranslations[lang][key]) {
@@ -155,62 +145,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // 2. Si on est sur la page projet, re-rendre le contenu du projet
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('id');
         if (projectId && projectsData[projectId]) {
             renderProjectDetails(projectId, lang);
         }
 
-        // 3. Si on est sur l'accueil, relancer le Typed.js
         if (document.getElementById('typed-text')) {
             initTyped(lang);
         }
 
-        // Update project previews/types on the index page if present
         if (document.querySelector('.project-grid')) {
             populateProjectPreviews(lang);
         }
     }
 
-    // Helpers to show/hide the in-page project detail (used on index.html)
     function showProjectDetail(id, lang) {
         const pd = document.getElementById('project-detail');
         const mainEl = document.querySelector('main');
         if (!pd) return;
         renderProjectDetails(id, lang || currentLang);
 
-        // Save current scroll to restore later
         try { window._prevScrollY = window.scrollY || window.pageYOffset; } catch (e) { window._prevScrollY = 0; }
 
-
-        // Move the project-detail inside the projets section so it appears in-place
         const projetsEl = document.getElementById('projets');
         if (projetsEl) {
-            // Save original parent & nextSibling to restore later
             if (!window._pdOriginalParent) {
                 window._pdOriginalParent = pd.parentNode;
                 window._pdOriginalNext = pd.nextSibling;
             }
 
-            // Insert pd right after the section title (before filters)
             const insertBeforeEl = projetsEl.querySelector('.filter-controls') || projetsEl.querySelector('.project-grid') || null;
             projetsEl.insertBefore(pd, insertBeforeEl);
 
-            // Ensure detail is visible (was initially display:none)
             pd.style.display = 'block';
 
-            // Hide the filters and project grid to make room for detail
             const fc = projetsEl.querySelector('.filter-controls');
             const grid = projetsEl.querySelector('.project-grid');
             if (fc) fc.style.display = 'none';
             if (grid) grid.style.display = 'none';
         } else {
-            // If no projets section, ensure pd is visible
             pd.style.display = 'block';
         }
-
-        // After DOM updates, compute where the projets section (or pd) is now and scroll there
         requestAnimationFrame(() => {
             const targetEl = document.getElementById('projets') || pd;
             const rect = targetEl.getBoundingClientRect();
@@ -223,7 +199,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const pd = document.getElementById('project-detail');
         const mainEl = document.querySelector('main');
         if (!pd) return;
-        // If we previously moved pd, move it back to its original location
         try {
             const projetsEl = document.getElementById('projets');
             if (projetsEl) {
@@ -237,27 +212,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const parent = window._pdOriginalParent;
                 const next = window._pdOriginalNext;
                 parent.insertBefore(pd, next);
-                // hide detail again when moved back to original place
                 pd.style.display = 'none';
                 delete window._pdOriginalParent;
                 delete window._pdOriginalNext;
             } else {
-                // if no original parent, just hide
                 pd.style.display = 'none';
             }
         } catch (e) {
             pd.style.display = 'none';
         }
 
-        // Restore previous scroll position if available, otherwise go to top
         const prev = (typeof window._prevScrollY !== 'undefined') ? window._prevScrollY : 0;
         window.scrollTo({ top: prev, behavior: 'smooth' });
     }
 
-    // expose helpers globally
     try { window.showProjectDetail = showProjectDetail; window.hideProjectDetail = hideProjectDetail; } catch(e) {}
 
-    // back button inside in-page project detail
     const detailBackBtn = document.getElementById('detail-back');
     if (detailBackBtn) {
         detailBackBtn.addEventListener('click', (e) => {
@@ -266,10 +236,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Écouteur sur le bouton de langue
     const langBtn = document.getElementById('lang-toggle-btn');
     if (langBtn) {
-        // Initialiser l'état du bouton
         langBtn.textContent = (currentLang === 'fr') ? 'EN' : 'FR';
         
         langBtn.addEventListener('click', () => {
@@ -278,13 +246,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- 3. LOGIQUE DE PAGE ---
-
-    // Vérifier sur quelle page on est
     const isProjectPage = window.location.pathname.includes('project.html');
 
     if (isProjectPage) {
-        // === LOGIQUE PAGE PROJET ===
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('id');
 
@@ -295,16 +259,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
     } else {
-        // === LOGIQUE PAGE ACCUEIL ===
-        
-        // Smooth Scroll (Lenis)
         if (typeof Lenis !== 'undefined') {
             const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
             function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
             requestAnimationFrame(raf);
         }
 
-        // Filtres
         const filterButtons = document.querySelectorAll('.filter-btn');
         const projectTiles = document.querySelectorAll('.project-tile');
 
@@ -326,21 +286,17 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Typed JS Init
         initTyped(currentLang);
 
-        // Populate previews for each project tile
         populateProjectPreviews(currentLang);
     }
 
-    // Appliquer la langue au chargement
     updatePageLanguage(currentLang);
 
-    // --- 4. FONCTIONS UTILITAIRES ---
 
     function renderProjectDetails(id, lang) {
         const data = projectsData[id];
-        const content = data[lang]; // fr ou en
+        const content = data[lang]; 
 
         document.getElementById('detail-title').textContent = content.title;
         document.getElementById('detail-image').src = data.image;
@@ -348,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('detail-date').textContent = content.date;
         document.getElementById('detail-type').textContent = content.type;
 
-        // Techs
         const techContainer = document.getElementById('detail-tech-list');
         if(techContainer) {
             techContainer.innerHTML = '';
@@ -359,7 +314,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Links
         const linksContainer = document.getElementById('detail-links');
         if(linksContainer) {
             linksContainer.innerHTML = '';
@@ -371,20 +325,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 linksContainer.appendChild(a);
             });
         }
-        // expose for global usage (index in-page rendering)
         try { window.renderProjectDetails = renderProjectDetails; } catch(e) {}
     }
 
-    // Populate short previews and type badges on index tiles
     function populateProjectPreviews(lang) {
         Object.keys(projectsData).forEach(key => {
             const data = projectsData[key];
             const content = data[lang] || data['fr'];
 
-            // Preview
             const previewEl = document.querySelector(`.project-preview[data-project="${key}"]`);
             if (previewEl) {
-                // create a short preview (first 120 chars, preserve words)
                 const txt = content.description.replace(/\s+/g, ' ').trim();
                 const max = 120;
                 let short = txt;
@@ -397,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 previewEl.textContent = short;
             }
 
-            // Type badge
             const typeEl = document.querySelector(`.project-type[data-project="${key}"]`);
             if (typeEl) {
                 typeEl.textContent = content.type || '';
@@ -407,7 +356,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function initTyped(lang) {
         if (document.getElementById('typed-text')) {
-            // Détruire l'instance précédente si elle existe (pour éviter superposition)
             if(window.typedInstance) { window.typedInstance.destroy(); }
 
             const strings = (lang === 'fr') 
@@ -421,7 +369,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Particles JS (Commun aux deux pages)
     if (document.getElementById('particles-js')) {
         particlesJS('particles-js', {
     "particles": {
@@ -536,15 +483,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Fonction globale pour la redirection (appelée par le HTML)
 function goToProject(id) {
-    // If the current page has an in-page project detail section, open it instead
     const inPage = document.getElementById('project-detail');
     const lang = localStorage.getItem('siteLanguage') || 'fr';
     if (inPage && window.showProjectDetail) {
         window.showProjectDetail(id, lang);
         return;
     }
-    // fallback to dedicated project page
     window.location.href = `pages/project.html?id=${id}`;
 }
