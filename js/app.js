@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const projectsData = {
         'laravel': {
-            image: "assets/imgWIP.png",
+            image: "assets/imageLeboncoin.png",
             techs: ["Laravel", "PHP", "PostgreSQL", "Power BI", "MERISE", "BPMN"],
             links: [{ text: "GitHub", url: "https://github.com/BazeOnigiri/SAE_Leboncoin" }],
             fr: {
